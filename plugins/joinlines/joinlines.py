@@ -91,9 +91,10 @@ class JoinLinesViewActivatable(GObject.Object, Gedit.ViewActivatable):
 
     def do_activate(self):
         self.view.join_lines_view_activatable = self
-        self.view.connect('populate-popup', self.populate_popup)
+        self.popup_handler_id = self.view.connect('populate-popup', self.populate_popup)
 
     def do_deactivate(self):
+        self.view.disconnect(self.popup_handler_id)
         delattr(self.view, "join_lines_view_activatable")
 
     def populate_popup(self, view, popup):
