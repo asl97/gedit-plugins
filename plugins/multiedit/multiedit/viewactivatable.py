@@ -60,6 +60,7 @@ class MultiEditViewActivatable(GObject.Object, Gedit.ViewActivatable, Signals):
         handlers = {
             'notify::buffer': self.on_notify_buffer,
             'key-press-event': self.on_key_press_event,
+            'button-release-event': self.on_button_release_event,
             'draw': self.on_view_draw,
             'style-set': self.on_view_style_set,
             'undo': self.on_view_undo,
@@ -787,6 +788,19 @@ class MultiEditViewActivatable(GObject.Object, Gedit.ViewActivatable, Signals):
 
             if (not handler[3] or self._in_mode) and event.keyval in handler[0] and (defmod == state):
                 return handler[2](event)
+
+        return False
+
+    def on_button_release_event(self, view, event):
+        handler = self._event_handlers['toggle_edit_point']
+
+        keymap = Gdk.Keymap.get_for_display(view.get_display())
+        defmod = Gtk.accelerator_get_default_mod_mask() & event.state
+        _, state = keymap.map_virtual_modifiers(handler[1])
+
+
+        if (not handler[3] or self._in_mode) and event.button == 1 and (defmod == state):
+            handler[2](event)
 
         return False
 
